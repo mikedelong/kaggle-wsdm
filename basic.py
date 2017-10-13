@@ -1,17 +1,16 @@
 # https://www.kaggle.com/kamilkk/simple-fast-lgbm-0-66683
 # copied 2017-10-12
 
+import gc
+import logging
+import time
+
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm
-
-import logging
-import time
-import gc
-
 
 start_time = time.time()
 # set up logging
@@ -36,14 +35,17 @@ song_cols = ['song_id', 'artist_name', 'genre_ids', 'song_length', 'language']
 train = train.merge(songs[song_cols], on='song_id', how='left')
 test = test.merge(songs[song_cols], on='song_id', how='left')
 
+# todo fix this
 members['registration_year'] = members['registration_init_time'].apply(lambda x: int(str(x)[0:4]))
 members['registration_month'] = members['registration_init_time'].apply(lambda x: int(str(x)[4:6]))
 members['registration_date'] = members['registration_init_time'].apply(lambda x: int(str(x)[6:8]))
 
+# todo fix this
 members['expiration_year'] = members['expiration_date'].apply(lambda x: int(str(x)[0:4]))
 members['expiration_month'] = members['expiration_date'].apply(lambda x: int(str(x)[4:6]))
 members['expiration_date'] = members['expiration_date'].apply(lambda x: int(str(x)[6:8]))
-members = members.drop(['registration_init_time'], axis=1)
+# todo figure out why dropping the expiration date here makes our AUC worse
+members = members.drop(['registration_init_time', 'expiration_date'], axis=1)
 
 members_cols = members.columns
 train = train.merge(members[members_cols], on='msno', how='left')
@@ -51,7 +53,6 @@ test = test.merge(members[members_cols], on='msno', how='left')
 
 train = train.fillna(-1)
 test = test.fillna(-1)
-
 
 del members, songs
 gc.collect()
@@ -100,7 +101,8 @@ params['num_leaves'] = 2 ** 8
 params['verbosity'] = 0
 params['metric'] = 'auc'
 
-model = lgb.train(params, train_set=d_train, num_boost_round=200, valid_sets=watchlist, early_stopping_rounds=10, verbose_eval=10)
+model = lgb.train(params, train_set=d_train, num_boost_round=500, valid_sets=watchlist, early_stopping_rounds=10,
+                  verbose_eval=10)
 
 logger.debug('Making predictions and saving them...')
 p_test = model.predict(X_test)
