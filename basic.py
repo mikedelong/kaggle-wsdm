@@ -90,27 +90,35 @@ gc.collect()
 d_train = lgb.Dataset(X_train, label=y_train)
 d_valid = lgb.Dataset(X_valid, label=y_valid)
 
+logger.debug('Training LGBM model...')
+params = {'learning_rate': 0.4, 'application': 'binary', 'max_depth': 15, 'num_leaves': 2 ** 8, 'verbosity': 0,
+          'metric': 'auc'}
+
+num_boost_rounds = 1000
+early_stopping_rounds = 20
+cv_nfold = 10
+logger.debug('cross-validating with %d folds' % cv_nfold)
+evaluation_history = lgb.cv(params, train_set=d_train, num_boost_round=num_boost_rounds, nfold=cv_nfold,
+                            early_stopping_rounds=early_stopping_rounds)
+logger.debug(evaluation_history)
+logger.debug(evaluation_history.keys())
+actual_boost_rounds = len(evaluation_history['auc-mean'])
+logger.debug('training the model with %d rounds' % actual_boost_rounds)
+
 watchlist = [d_train, d_valid]
 
-logger.debug('Training LGBM model...')
-params = {}
-params['learning_rate'] = 0.4
-params['application'] = 'binary'
-params['max_depth'] = 15
-params['num_leaves'] = 2 ** 8
-params['verbosity'] = 0
-params['metric'] = 'auc'
-
-model = lgb.train(params, train_set=d_train, num_boost_round=500, valid_sets=watchlist, early_stopping_rounds=10,
+model = lgb.train(params, train_set=d_train, num_boost_round=actual_boost_rounds, valid_sets=watchlist,
+                  early_stopping_rounds=early_stopping_rounds,
                   verbose_eval=10)
 
-logger.debug('Making predictions and saving them...')
+logger.debug('Making predictions.')
 p_test = model.predict(X_test)
 
-subm = pd.DataFrame()
-subm['id'] = ids
-subm['target'] = p_test
-subm.to_csv('submission.csv.gz', compression='gzip', index=False, float_format='%.5f')
+logger.debug('writing the submission file')
+submission_data = pd.DataFrame()
+submission_data['id'] = ids
+submission_data['target'] = p_test
+submission_data.to_csv('submission.csv.gz', compression='gzip', index=False, float_format='%.5f')
 
 logger.debug('done')
 elapsed_time = time.time() - start_time
