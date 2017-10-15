@@ -108,8 +108,7 @@ logger.debug('training the model with %d rounds' % actual_boost_rounds)
 watchlist = [d_train, d_valid]
 
 model = lgb.train(params, train_set=d_train, num_boost_round=actual_boost_rounds, valid_sets=watchlist,
-                  early_stopping_rounds=early_stopping_rounds,
-                  verbose_eval=10)
+                  early_stopping_rounds=early_stopping_rounds, verbose_eval=10)
 
 logger.debug('Making predictions.')
 p_test = model.predict(X_test)
