@@ -82,7 +82,8 @@ del train, test
 gc.collect()
 
 random_state = 1
-X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.1, random_state=random_state)
+test_size = 0.2
+X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
 del X, y
 gc.collect()
