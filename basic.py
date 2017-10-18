@@ -35,6 +35,9 @@ song_cols = ['song_id', 'artist_name', 'genre_ids', 'song_length', 'language']
 train = train.merge(songs[song_cols], on='song_id', how='left')
 test = test.merge(songs[song_cols], on='song_id', how='left')
 
+# todo convert the dates into a days ago
+# https://www.kaggle.com/juanumusic/days-instead-of-dates-lgbm-0-66870
+
 # todo fix this
 members['registration_year'] = members['registration_init_time'].apply(lambda x: int(str(x)[0:4]))
 members['registration_month'] = members['registration_init_time'].apply(lambda x: int(str(x)[4:6]))
@@ -97,7 +100,7 @@ params = {'learning_rate': 0.4, 'application': 'binary', 'max_depth': 15, 'num_l
 
 num_boost_rounds = 1000
 early_stopping_rounds = 20
-cv_nfold = 10
+cv_nfold = 5
 logger.debug('cross-validating with %d folds' % cv_nfold)
 evaluation_history = lgb.cv(params, train_set=d_train, num_boost_round=num_boost_rounds, nfold=cv_nfold,
                             early_stopping_rounds=early_stopping_rounds)
