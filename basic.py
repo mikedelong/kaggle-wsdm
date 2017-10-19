@@ -28,7 +28,8 @@ data_path = './input/'
 train = pd.read_csv(data_path + 'train.csv')
 test = pd.read_csv(data_path + 'test.csv')
 songs = pd.read_csv(data_path + 'songs.csv')
-members = pd.read_csv(data_path + 'members.csv')
+members = pd.read_csv(data_path + 'members.csv', parse_dates=['registration_init_time','expiration_date'])
+
 
 logger.debug('Data preprocessing...')
 song_cols = ['song_id', 'artist_name', 'genre_ids', 'song_length', 'language']
@@ -38,15 +39,19 @@ test = test.merge(songs[song_cols], on='song_id', how='left')
 # todo convert the dates into a days ago
 # https://www.kaggle.com/juanumusic/days-instead-of-dates-lgbm-0-66870
 
-# todo fix this
-members['registration_year'] = members['registration_init_time'].apply(lambda x: int(str(x)[0:4]))
-members['registration_month'] = members['registration_init_time'].apply(lambda x: int(str(x)[4:6]))
-members['registration_date'] = members['registration_init_time'].apply(lambda x: int(str(x)[6:8]))
+if True:
+    members['membership_days'] = (members['expiration_date'] - members['registration_init_time']).dt.days.astype(int)
 
-# todo fix this
-members['expiration_year'] = members['expiration_date'].apply(lambda x: int(str(x)[0:4]))
-members['expiration_month'] = members['expiration_date'].apply(lambda x: int(str(x)[4:6]))
-members['expiration_date'] = members['expiration_date'].apply(lambda x: int(str(x)[6:8]))
+else:
+    # todo fix this
+    members['registration_year'] = members['registration_init_time'].apply(lambda x: int(str(x)[0:4]))
+    members['registration_month'] = members['registration_init_time'].apply(lambda x: int(str(x)[4:6]))
+    members['registration_date'] = members['registration_init_time'].apply(lambda x: int(str(x)[6:8]))
+
+    # todo fix this
+    members['expiration_year'] = members['expiration_date'].apply(lambda x: int(str(x)[0:4]))
+    members['expiration_month'] = members['expiration_date'].apply(lambda x: int(str(x)[4:6]))
+    members['expiration_date'] = members['expiration_date'].apply(lambda x: int(str(x)[6:8]))
 # todo figure out why dropping the expiration date here makes our AUC worse
 members = members.drop(['registration_init_time', 'expiration_date'], axis=1)
 
