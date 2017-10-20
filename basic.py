@@ -11,6 +11,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 start_time = time.time()
 # set up logging
@@ -35,7 +36,7 @@ song_cols = ['song_id', 'artist_name', 'genre_ids', 'song_length', 'language']
 train = train.merge(songs[song_cols], on='song_id', how='left')
 test = test.merge(songs[song_cols], on='song_id', how='left')
 
-# todo convert the dates into a days ago
+# todo convert the dates into a days ago column
 # https://www.kaggle.com/juanumusic/days-instead-of-dates-lgbm-0-66870
 
 if True:
@@ -130,3 +131,7 @@ submission_data.to_csv('submission.csv.gz', compression='gzip', index=False, flo
 logger.debug('done')
 elapsed_time = time.time() - start_time
 logger.debug('elapsed time %d seconds', elapsed_time)
+
+logger.debug('Plot feature importances...')
+ax = lgb.plot_importance(model, max_num_features=10)
+plt.show()
