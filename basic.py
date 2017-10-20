@@ -28,8 +28,7 @@ data_path = './input/'
 train = pd.read_csv(data_path + 'train.csv')
 test = pd.read_csv(data_path + 'test.csv')
 songs = pd.read_csv(data_path + 'songs.csv')
-members = pd.read_csv(data_path + 'members.csv', parse_dates=['registration_init_time','expiration_date'])
-
+members = pd.read_csv(data_path + 'members.csv', parse_dates=['registration_init_time', 'expiration_date'])
 
 logger.debug('Data preprocessing...')
 song_cols = ['song_id', 'artist_name', 'genre_ids', 'song_length', 'language']
