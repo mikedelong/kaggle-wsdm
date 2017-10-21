@@ -36,12 +36,11 @@ song_cols = ['song_id', 'artist_name', 'genre_ids', 'song_length', 'language']
 train = train.merge(songs[song_cols], on='song_id', how='left')
 test = test.merge(songs[song_cols], on='song_id', how='left')
 
-# todo convert the dates into a days ago column
-# https://www.kaggle.com/juanumusic/days-instead-of-dates-lgbm-0-66870
+# todo figure out why dropping the expiration date here makes our AUC worse
 
 if True:
+    # https://www.kaggle.com/juanumusic/days-instead-of-dates-lgbm-0-66870
     members['membership_days'] = (members['expiration_date'] - members['registration_init_time']).dt.days.astype(int)
-
 else:
     # todo fix this
     members['registration_year'] = members['registration_init_time'].apply(lambda x: int(str(x)[0:4]))
@@ -52,7 +51,6 @@ else:
     members['expiration_year'] = members['expiration_date'].apply(lambda x: int(str(x)[0:4]))
     members['expiration_month'] = members['expiration_date'].apply(lambda x: int(str(x)[4:6]))
     members['expiration_date'] = members['expiration_date'].apply(lambda x: int(str(x)[6:8]))
-# todo figure out why dropping the expiration date here makes our AUC worse
 members = members.drop(['registration_init_time', 'expiration_date'], axis=1)
 
 members_cols = members.columns
@@ -133,5 +131,5 @@ elapsed_time = time.time() - start_time
 logger.debug('elapsed time %d seconds', elapsed_time)
 
 logger.debug('Plot feature importances...')
-ax = lgb.plot_importance(model, max_num_features=10)
+ax = lgb.plot_importance(model)
 plt.show()
