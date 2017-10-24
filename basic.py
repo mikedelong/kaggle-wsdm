@@ -130,6 +130,7 @@ logger.debug('done')
 elapsed_time = time.time() - start_time
 logger.debug('elapsed time %d seconds', elapsed_time)
 
-logger.debug('Plot feature importances...')
+feature_file = 'lightgb_features.png'
+logger.debug('Plotting feature importance %s' % feature_file)
 ax = lgb.plot_importance(model)
-plt.show()
+plt.savefig('./' + feature_file)
