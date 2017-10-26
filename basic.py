@@ -98,7 +98,9 @@ d_train = lgb.Dataset(X_train, label=y_train, feature_name=cols, categorical_fea
 d_valid = lgb.Dataset(X_valid, label=y_valid, feature_name=cols, categorical_feature = 'auto')
 
 logger.debug('Training LGBM model...')
-params = {'learning_rate': 0.4, 'application': 'binary', 'max_depth': 15, 'num_leaves': 2 ** 8, 'verbosity': 0,
+params = {'learning_rate': 0.4, 'application': 'binary',
+          'max_depth': -1, # was 15
+          'num_leaves': 2 ** 8, 'verbosity': 0,
           'metric': 'auc'}
 
 num_boost_rounds = 1000
