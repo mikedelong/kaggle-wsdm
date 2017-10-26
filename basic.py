@@ -94,8 +94,8 @@ X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=test_size,
 del X, y
 gc.collect()
 
-d_train = lgb.Dataset(X_train, label=y_train, feature_name=cols)
-d_valid = lgb.Dataset(X_valid, label=y_valid, feature_name=cols)
+d_train = lgb.Dataset(X_train, label=y_train, feature_name=cols, categorical_feature = 'auto')
+d_valid = lgb.Dataset(X_valid, label=y_valid, feature_name=cols, categorical_feature = 'auto')
 
 logger.debug('Training LGBM model...')
 params = {'learning_rate': 0.4, 'application': 'binary', 'max_depth': 15, 'num_leaves': 2 ** 8, 'verbosity': 0,
