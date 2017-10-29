@@ -103,7 +103,7 @@ params = {
     'learning_rate': 0.4,
     'max_depth': -1,  # was 15
     'metric': 'auc',
-    'nthread': -1,
+    'nthread': 4,
     'num_leaves': 2 ** 8,
     'verbosity': 0
 }
