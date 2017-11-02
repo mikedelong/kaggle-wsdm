@@ -100,7 +100,7 @@ d_valid = lgb.Dataset(X_valid, label=y_valid, feature_name=cols, categorical_fea
 logger.debug('Training LGBM model...')
 params = {
     'application': 'binary',
-    'learning_rate': 0.35, # was 0.4
+    'learning_rate': 0.45, # was 0.4
     'max_depth': -1,  # was 15
     'metric': 'auc',
     'nthread': 4,
