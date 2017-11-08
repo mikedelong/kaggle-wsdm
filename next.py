@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 print('Loading data...')
-data_path = '../input/'
+data_path = './input/'
 train = pd.read_csv(data_path + 'train.csv', dtype={'msno': 'category',
                                                     'source_system_tab': 'category',
                                                     'source_screen_name': 'category',
