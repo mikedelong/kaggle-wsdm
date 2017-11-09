@@ -2,6 +2,7 @@
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
+import gc
 
 print('Loading data...')
 data_path = './input/'
@@ -62,10 +63,9 @@ test = test.merge(members, on='msno', how='left')
 train = train.merge(songs_extra, on='song_id', how='left')
 test = test.merge(songs_extra, on='song_id', how='left')
 
-import gc
 
-del members, songs;
-gc.collect();
+del members, songs
+gc.collect()
 
 for col in train.columns:
     if train[col].dtype == object:
@@ -87,13 +87,8 @@ watchlist = [d_train]
 # Those parameters are almost out of hat, so feel free to play with them. I can tell
 # you, that if you do it right, you will get better results for sure ;)
 print('Training LGBM model...')
-params = {}
-params['learning_rate'] = 0.2
-params['application'] = 'binary'
-params['max_depth'] = 8
-params['num_leaves'] = 2 ** 8
-params['verbosity'] = 0
-params['metric'] = 'auc'
+params = {'application': 'binary', 'learning_rate': 0.2, 'max_depth': 8, 'metric': 'auc', 'num_leaves': 2 ** 8,
+          'verbosity': 0}
 
 model = lgb.train(params, train_set=d_train, num_boost_round=50, valid_sets=watchlist, verbose_eval=5)
 
