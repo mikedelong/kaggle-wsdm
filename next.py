@@ -7,6 +7,21 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
+import gc
+import logging
+import time
+
+start_time = time.time()
+# set up logging
+formatter = logging.Formatter('%(asctime)s : %(name)s :: %(levelname)s : %(message)s')
+logger = logging.getLogger('main')
+logger.setLevel(logging.DEBUG)
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+console_handler.setLevel(logging.DEBUG)
+logger.debug('started')
+
 # print('Loading data...')
 data_path = './input/'
 
@@ -104,14 +119,14 @@ data_path = './input/'
 # subm.to_csv('submission.csv.gz', compression='gzip', index=False, float_format='%.5f')
 # print('Done!')
 
-print('Loading data...')
+logger.debug('Loading data...')
 # data_path = '../input/'
 train = pd.read_csv(data_path + 'train.csv')
 test = pd.read_csv(data_path + 'test.csv')
 songs = pd.read_csv(data_path + 'songs.csv')
 members = pd.read_csv(data_path + 'members.csv')
 
-print('Data preprocessing...')
+logger.debug('Data preprocessing...')
 song_cols = ['song_id', 'artist_name', 'genre_ids', 'song_length', 'language']
 train = train.merge(songs[song_cols], on='song_id', how='left')
 test = test.merge(songs[song_cols], on='song_id', how='left')
@@ -171,17 +186,20 @@ d_valid = lgb.Dataset(X_valid, label=y_valid)
 
 watchlist = [d_train, d_valid]
 
-print('Training LGBM model...')
+logger.debug('Training LGBM model...')
 params = {'application': 'binary', 'learning_rate': 0.4, 'max_depth': 15, 'metric': 'auc', 'num_leaves': 2 ** 8,
           'verbosity': 0}
 
 model = lgb.train(params, train_set=d_train, num_boost_round=200, valid_sets=watchlist, early_stopping_rounds=10, verbose_eval=10)
 
-print('Making predictions and saving them...')
+logger.debug('Making predictions and saving them...')
 p_test = model.predict(X_test)
 
 subm = pd.DataFrame()
 subm['id'] = ids
 subm['target'] = p_test
 subm.to_csv('submission.csv.gz', compression='gzip', index=False, float_format='%.5f')
-print('Done!')
+
+logger.debug('done')
+elapsed_time = time.time() - start_time
+logger.debug('elapsed time %d seconds', elapsed_time)
