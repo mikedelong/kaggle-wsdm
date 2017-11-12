@@ -191,7 +191,7 @@ logger.debug('Training LGBM model...')
 params = {'application': 'binary', 'learning_rate': 0.4, 'max_depth': 15, 'metric': 'auc', 'num_leaves': 2 ** 8,
           'verbosity': 0}
 
-model = lgb.train(params, train_set=d_train, num_boost_round=1000, valid_sets=watchlist, early_stopping_rounds=40,
+model = lgb.train(params, train_set=d_train, num_boost_round=1000, valid_sets=watchlist, early_stopping_rounds=20,
                   verbose_eval=10)
 
 logger.debug('Making predictions and saving them...')
