@@ -176,7 +176,8 @@ ids = test['id'].values
 del train, test
 gc.collect()
 
-X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.1, random_state=12)
+random_seed = 1
+X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.1, random_state=random_seed)
 
 del X, y
 gc.collect()
@@ -190,7 +191,8 @@ logger.debug('Training LGBM model...')
 params = {'application': 'binary', 'learning_rate': 0.4, 'max_depth': 15, 'metric': 'auc', 'num_leaves': 2 ** 8,
           'verbosity': 0}
 
-model = lgb.train(params, train_set=d_train, num_boost_round=200, valid_sets=watchlist, early_stopping_rounds=10, verbose_eval=10)
+model = lgb.train(params, train_set=d_train, num_boost_round=1000, valid_sets=watchlist, early_stopping_rounds=40,
+                  verbose_eval=10)
 
 logger.debug('Making predictions and saving them...')
 p_test = model.predict(X_test)
