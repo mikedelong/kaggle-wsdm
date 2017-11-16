@@ -124,21 +124,38 @@ logger.debug('Loading data...')
 train = pd.read_csv(data_path + 'train.csv')
 test = pd.read_csv(data_path + 'test.csv')
 songs = pd.read_csv(data_path + 'songs.csv')
-members = pd.read_csv(data_path + 'members.csv')
+# members = pd.read_csv(data_path + 'members.csv')
+members = pd.read_csv(data_path + 'members.csv', parse_dates=['registration_init_time', 'expiration_date'])
 
 logger.debug('Data preprocessing...')
 song_cols = ['song_id', 'artist_name', 'genre_ids', 'song_length', 'language']
 train = train.merge(songs[song_cols], on='song_id', how='left')
 test = test.merge(songs[song_cols], on='song_id', how='left')
 
-members['registration_year'] = members['registration_init_time'].apply(lambda x: int(str(x)[0:4]))
-members['registration_month'] = members['registration_init_time'].apply(lambda x: int(str(x)[4:6]))
-members['registration_date'] = members['registration_init_time'].apply(lambda x: int(str(x)[6:8]))
+if False:
+    members['registration_year'] = members['registration_init_time'].apply(lambda x: int(str(x)[0:4]))
+    members['registration_month'] = members['registration_init_time'].apply(lambda x: int(str(x)[4:6]))
+    members['registration_date'] = members['registration_init_time'].apply(lambda x: int(str(x)[6:8]))
 
-members['expiration_year'] = members['expiration_date'].apply(lambda x: int(str(x)[0:4]))
-members['expiration_month'] = members['expiration_date'].apply(lambda x: int(str(x)[4:6]))
-members['expiration_date'] = members['expiration_date'].apply(lambda x: int(str(x)[6:8]))
-members = members.drop(['registration_init_time'], axis=1)
+    members['expiration_year'] = members['expiration_date'].apply(lambda x: int(str(x)[0:4]))
+    members['expiration_month'] = members['expiration_date'].apply(lambda x: int(str(x)[4:6]))
+    members['expiration_date'] = members['expiration_date'].apply(lambda x: int(str(x)[6:8]))
+    members = members.drop(['registration_init_time'], axis=1)
+
+if True:
+    # https://www.kaggle.com/juanumusic/days-instead-of-dates-lgbm-0-66870
+    members['membership_days'] = (members['expiration_date'] - members['registration_init_time']).dt.days.astype(int)
+else:
+    # todo fix this
+    members['registration_year'] = members['registration_init_time'].apply(lambda x: int(str(x)[0:4]))
+    members['registration_month'] = members['registration_init_time'].apply(lambda x: int(str(x)[4:6]))
+    members['registration_date'] = members['registration_init_time'].apply(lambda x: int(str(x)[6:8]))
+
+    # todo fix this
+    members['expiration_year'] = members['expiration_date'].apply(lambda x: int(str(x)[0:4]))
+    members['expiration_month'] = members['expiration_date'].apply(lambda x: int(str(x)[4:6]))
+    members['expiration_date'] = members['expiration_date'].apply(lambda x: int(str(x)[6:8]))
+members = members.drop(['registration_init_time', 'expiration_date'], axis=1)
 
 members_cols = members.columns
 train = train.merge(members[members_cols], on='msno', how='left')
