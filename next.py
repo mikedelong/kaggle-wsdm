@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import gc
 from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
@@ -145,6 +146,9 @@ if False:
 if True:
     # https://www.kaggle.com/juanumusic/days-instead-of-dates-lgbm-0-66870
     members['membership_days'] = (members['expiration_date'] - members['registration_init_time']).dt.days.astype(int)
+    min_max_scaler = MinMaxScaler(copy=True)
+    members['membership_days'] = min_max_scaler.fit_transform(members['membership_days'])
+
 else:
     # todo fix this
     members['registration_year'] = members['registration_init_time'].apply(lambda x: int(str(x)[0:4]))
